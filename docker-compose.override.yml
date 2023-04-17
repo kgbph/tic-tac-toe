@@ -1,0 +1,7 @@
+version: "3.8"
+services:
+  web:
+    build:
+      args:
+        PHP_MODE: development
+    ports: [80:80]

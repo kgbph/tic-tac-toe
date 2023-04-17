@@ -1,0 +1,10 @@
+version: "3.8"
+services:
+  web:
+    build:
+      args:
+        PHP_MODE: production
+      context: .
+    restart: unless-stopped
+    volumes:
+      - ./:/var/www/html
