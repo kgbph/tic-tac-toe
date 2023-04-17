@@ -70,6 +70,23 @@ class GameSession
     }
 
     /**
+     * Initiate surrender
+     *
+     * @param \App\Enums\Player $player
+     * @return self
+     */
+    public function surrender($player)
+    {
+        $this->status = GameSessionStatus::Finished;
+        $this->winner = match ($player) {
+            \App\Enums\Player::One => \App\Enums\Player::Two,
+            \App\Enums\Player::Two => \App\Enums\Player::One,
+        };
+
+        return $this;
+    }
+
+    /**
      * Update game session
      *
      * @param int $x

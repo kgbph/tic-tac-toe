@@ -30,4 +30,14 @@
         @endfor
     @endfor
 </div>
+
+@if ($game->getStatus() === \App\Enums\GameSessionStatus::Ongoing)
+<form method="POST" action="{{ route('player-surrenders') }}" class="flex justify-end mt-3">
+    @csrf
+
+    <button type="submit" class="px-4 py-2 font-semibold text-white bg-red-500 rounded">
+        {{ __('Surrender') }}
+    </button>
+</form>
+@endif
 @endsection

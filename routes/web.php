@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\GameSessionController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\PlayerSurrenderController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -25,3 +26,6 @@ Route::controller(GameSessionController::class)
         Route::post('', 'store')->name('store');
         Route::put('', 'update')->name('update');
     });
+
+Route::post('player-surrenders', PlayerSurrenderController::class)
+    ->name('player-surrenders');
