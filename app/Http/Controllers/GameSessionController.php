@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\GameSessionStatus;
+use App\Http\Requests\UpdateGameSessionRequest;
 use App\Objects\FourByFourBoard;
 use Illuminate\Http\Request;
 
@@ -45,5 +46,29 @@ class GameSessionController extends Controller
         }
 
         return view('game-sessions.show', compact('board'));
+    }
+
+    /**
+     * Update game session
+     *
+     * @param \App\Http\Requests\UpdateGameSessionRequest $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function update(UpdateGameSessionRequest $request)
+    {
+        $session = $request->session();
+
+        /** @var \App\Objects\AbstractBoard */
+        $board = $session->get('board');
+
+        $board = $board->tagCell(
+            $request->input('x'),
+            $request->input('y'),
+            $request->input('player'),
+        );
+
+        $session->put('board', $board);
+
+        return redirect()->route('game-sessions.show');
     }
 }

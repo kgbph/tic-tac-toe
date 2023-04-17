@@ -23,4 +23,5 @@ Route::controller(GameSessionController::class)
     ->group(function () {
         Route::get('', 'show')->name('show');
         Route::post('', 'store')->name('store');
+        Route::put('', 'update')->name('update');
     });

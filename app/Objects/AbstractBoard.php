@@ -34,7 +34,7 @@ abstract class AbstractBoard
     {
         for ($x = 0; $x < $this->width; $x++) {
             for ($y = 0; $y < $this->height; $y++) {
-                $this->cells[$x][$y] = new Cell();
+                $this->cells[$x][$y] = new Cell($x, $y);
             }
         }
     }
@@ -49,6 +49,26 @@ abstract class AbstractBoard
     public function getCell($x, $y)
     {
         return $this->cells[$x][$y] ?? null;
+    }
+
+    /**
+     * Tag cell
+     *
+     * @param int $x
+     * @param int $y
+     * @param int $player
+     * @return self
+     */
+    public function tagCell($x, $y, $player)
+    {
+        $cell = $this->getCell($x, $y);
+
+        if ($cell instanceof \App\Objects\Cell) {
+            $cell = $cell->setPlayer($player);
+            $this->cells[$x][$y] = $cell;
+        }
+
+        return $this;
     }
 
     /**
