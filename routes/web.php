@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\GameSessionController;
 use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 
@@ -15,3 +16,11 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', HomeController::class);
+
+Route::controller(GameSessionController::class)
+    ->prefix('game-sessions')
+    ->name('game-sessions.')
+    ->group(function () {
+        Route::get('', 'show')->name('show');
+        Route::post('', 'store')->name('store');
+    });
