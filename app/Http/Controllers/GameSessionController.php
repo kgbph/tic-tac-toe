@@ -34,6 +34,16 @@ class GameSessionController extends Controller
     {
         $session = $request->session();
 
-        return view('game-sessions.show');
+        $status = $session->get('status');
+        $board = $session->get('board');
+
+        if (
+            $status !== GameSessionStatus::Ongoing->value
+            || !($board instanceof \App\Objects\AbstractBoard)
+        ) {
+            return redirect()->route('home');
+        }
+
+        return view('game-sessions.show', compact('board'));
     }
 }
