@@ -2,6 +2,8 @@
 
 namespace App\Objects;
 
+use App\Enums\Player;
+
 abstract class AbstractBoard
 {
     /**
@@ -28,9 +30,9 @@ abstract class AbstractBoard
     /**
      * Last player
      *
-     * @var int
+     * @var \App\Enums\Player
      */
-    protected $lastPlayer = 0;
+    protected $lastPlayer;
 
     /**
      * Board constructor
@@ -63,7 +65,7 @@ abstract class AbstractBoard
      *
      * @param int $x
      * @param int $y
-     * @param int $player
+     * @param \App\Enums\Player $player
      * @return self
      */
     public function tagCell($x, $y, $player)
@@ -83,7 +85,7 @@ abstract class AbstractBoard
     /**
      * Get height
      *
-     * @var int
+     * @return int
      */
     public function getHeight()
     {
@@ -93,7 +95,7 @@ abstract class AbstractBoard
     /**
      * Get width
      *
-     * @var int
+     * @return int
      */
     public function getWidth()
     {
@@ -101,19 +103,179 @@ abstract class AbstractBoard
     }
 
     /**
+     * Get last player
+     *
+     * @return \App\Enums\Player
+     */
+    public function getLastPlayer()
+    {
+        return $this->lastPlayer;
+    }
+
+    /**
      * Get next player
      *
-     * @var int
+     * @return \App\Enums\Player
      */
     public function getNextPlayer()
     {
-        $max = (int) config('game.max_players');
+        return match ($this->lastPlayer) {
+            Player::One => Player::Two,
+            Player::Two => Player::One,
+            default => Player::One,
+        };
+    }
 
-        $nextPlayer = $this->lastPlayer + 1;
-        if ($nextPlayer > $max) {
-            $nextPlayer = 1;
+    /**
+     * Check if has column streak
+     *
+     * @param \App\Enums\Player $player
+     * @return bool
+     */
+    public function hasColumnStreak($player)
+    {
+        $width = $this->getWidth();
+        $height = $this->getHeight();
+
+        for ($x = 0; $x < $width; $x++) {
+            $streak = 0;
+
+            for ($y = 0; $y < $height; $y++) {
+                $cell = $this->getCell($x, $y);
+                if (
+                    $cell instanceof \App\Objects\Cell
+                    && $cell->getPlayer() === $player
+                ) {
+                    $streak++;
+                }
+            }
+
+            if ($streak === $height) {
+                return true;
+            }
         }
 
-        return $nextPlayer;
+        return false;
+    }
+
+    /**
+     * Check if has row streak
+     *
+     * @param \App\Enums\Player $player
+     * @return bool
+     */
+    public function hasRowStreak($player)
+    {
+        $width = $this->getWidth();
+        $height = $this->getHeight();
+
+        for ($y = 0; $y < $height; $y++) {
+            $streak = 0;
+
+            for ($x = 0; $x < $width; $x++) {
+                $cell = $this->getCell($x, $y);
+                if (
+                    $cell instanceof \App\Objects\Cell
+                    && $cell->getPlayer() === $player
+                ) {
+                    $streak++;
+                }
+            }
+
+            if ($streak === $width) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if has forward diagonal streak
+     *
+     * @param \App\Enums\Player $player
+     * @return bool
+     */
+    public function hasForwardDiagonalStreak($player)
+    {
+        $width = $this->getWidth();
+        $height = $this->getHeight();
+
+        if ($width === $height) {
+            $streak = 0;
+
+            for ($x = 0; $x < $width; $x++) {
+                $cell = $this->getCell($x, $x);
+                if (
+                    $cell instanceof \App\Objects\Cell
+                    && $cell->getPlayer() === $player
+                ) {
+                    $streak++;
+                }
+            }
+
+            if ($streak === $width) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if has backward diagonal streak
+     *
+     * @param \App\Enums\Player $player
+     * @return bool
+     */
+    public function hasBackwardDiagonalStreak($player)
+    {
+        $width = $this->getWidth();
+        $height = $this->getHeight();
+
+        if ($width === $height) {
+            $streak = 0;
+
+            for ($x = 0; $x < $width; $x++) {
+                $cell = $this->getCell($x, $width - $x - 1);
+                if (
+                    $cell instanceof \App\Objects\Cell
+                    && $cell->getPlayer() === $player
+                ) {
+                    $streak++;
+                }
+            }
+
+            if ($streak === $width) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if has available space
+     *
+     * @return bool
+     */
+    public function hasAvailableSpace()
+    {
+        $width = $this->getWidth();
+        $height = $this->getHeight();
+
+        for ($x = 0; $x < $width; $x++) {
+            for ($y = 0; $y < $height; $y++) {
+                $cell = $this->getCell($x, $y);
+                if (
+                    $cell instanceof \App\Objects\Cell
+                    && $cell->getPlayer() === null
+                ) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }

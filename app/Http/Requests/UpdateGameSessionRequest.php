@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests;
 
-use App\Enums\GameSessionStatus;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateGameSessionRequest extends FormRequest
@@ -12,11 +11,10 @@ class UpdateGameSessionRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        $status = session('status');
-        $board = session('board');
+        $game = session('game');
 
-        return $status === GameSessionStatus::Ongoing->value
-            && $board instanceof \App\Objects\AbstractBoard;
+        return $game instanceof \App\Objects\GameSession
+            && $game->getStatus() === \App\Enums\GameSessionStatus::Ongoing;
     }
 
     /**
@@ -26,8 +24,10 @@ class UpdateGameSessionRequest extends FormRequest
      */
     public function rules(): array
     {
-        /** @var \App\Objects\AbstractBoard */
-        $board = session('board');
+        /** @var \App\Objects\GameSession */
+        $game = session('game');
+
+        $board = $game->getBoard();
 
         return [
             'x' => ['required', 'integer', 'max:' . $board->getWidth()],

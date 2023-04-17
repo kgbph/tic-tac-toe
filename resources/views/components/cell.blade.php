@@ -1,4 +1,4 @@
-@props(['cell'])
+@props(['cell', 'disabled'])
 
 <form method="POST" action="{{ route('game-sessions.update') }}">
     @csrf
@@ -9,12 +9,12 @@
 
     <button type="submit"
         class="w-32 h-32 bg-gray-900 flex justify-center items-center text-3xl text-white font-bold"
-        @disabled($cell->getPlayer())>
+        @disabled($disabled)>
         @switch($cell->getPlayer())
-            @case(1)
+            @case(\App\Enums\Player::One)
                 {{ __('X') }}
                 @break
-            @case(2)
+            @case(\App\Enums\Player::Two)
                 {{ __('O') }}
                 @break
             @default

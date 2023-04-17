@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\GameSessionStatus;
 use App\Http\Requests\UpdateGameSessionRequest;
 use App\Objects\FourByFourBoard;
+use App\Objects\GameSession;
 use Illuminate\Http\Request;
 
 class GameSessionController extends Controller
@@ -19,8 +20,10 @@ class GameSessionController extends Controller
     {
         $session = $request->session();
 
-        $session->put('status', GameSessionStatus::Ongoing->value);
-        $session->put('board', new FourByFourBoard());
+        $board = new FourByFourBoard();
+        $game = new GameSession($board);
+
+        $session->put('game', $game);
 
         return redirect()->route('game-sessions.show');
     }
@@ -34,18 +37,29 @@ class GameSessionController extends Controller
     public function show(Request $request)
     {
         $session = $request->session();
+        $game = $session->get('game');
 
-        $status = $session->get('status');
-        $board = $session->get('board');
-
-        if (
-            $status !== GameSessionStatus::Ongoing->value
-            || !($board instanceof \App\Objects\AbstractBoard)
-        ) {
+        if (!$game instanceof GameSession) {
             return redirect()->route('home');
         }
 
-        return view('game-sessions.show', compact('board'));
+        $board = $game->getBoard();
+        $status = $game->getStatus();
+        $winner = $game->getWinner();
+
+        if ($status === GameSessionStatus::Finished) {
+            $message = __('The game resulted in a draw.');
+
+            if ($winner) {
+                $message = __('Player :winner has won the game.', [
+                    'winner' => $winner->value,
+                ]);
+            }
+
+            session()->flash('success', $message);
+        }
+
+        return view('game-sessions.show', compact('board', 'game', 'status'));
     }
 
     /**
@@ -58,16 +72,18 @@ class GameSessionController extends Controller
     {
         $session = $request->session();
 
-        /** @var \App\Objects\AbstractBoard */
-        $board = $session->get('board');
+        /** @var \App\Objects\GameSession */
+        $game = $session->get('game');
 
-        $board = $board->tagCell(
+        $board = $game->getBoard();
+
+        $game = $game->update(
             $request->input('x'),
             $request->input('y'),
             $board->getNextPlayer(),
         );
 
-        $session->put('board', $board);
+        $session->put('game', $game);
 
         return redirect()->route('game-sessions.show');
     }
