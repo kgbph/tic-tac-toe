@@ -26,6 +26,13 @@ abstract class AbstractBoard
     protected $width;
 
     /**
+     * Last player
+     *
+     * @var int
+     */
+    protected $lastPlayer = 0;
+
+    /**
      * Board constructor
      *
      * @return void
@@ -65,7 +72,9 @@ abstract class AbstractBoard
 
         if ($cell instanceof \App\Objects\Cell) {
             $cell = $cell->setPlayer($player);
+
             $this->cells[$x][$y] = $cell;
+            $this->lastPlayer = $player;
         }
 
         return $this;
@@ -89,5 +98,22 @@ abstract class AbstractBoard
     public function getWidth()
     {
         return $this->width;
+    }
+
+    /**
+     * Get next player
+     *
+     * @var int
+     */
+    public function getNextPlayer()
+    {
+        $max = (int) config('game.max_players');
+
+        $nextPlayer = $this->lastPlayer + 1;
+        if ($nextPlayer > $max) {
+            $nextPlayer = 1;
+        }
+
+        return $nextPlayer;
     }
 }

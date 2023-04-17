@@ -32,7 +32,6 @@ class UpdateGameSessionRequest extends FormRequest
         return [
             'x' => ['required', 'integer', 'max:' . $board->getWidth()],
             'y' => ['required', 'integer', 'max:' . $board->getHeight()],
-            'player' => ['required', 'integer', 'max:' . config('game.max_players')],
         ];
     }
 }

@@ -64,7 +64,7 @@ class GameSessionController extends Controller
         $board = $board->tagCell(
             $request->input('x'),
             $request->input('y'),
-            $request->input('player'),
+            $board->getNextPlayer(),
         );
 
         $session->put('board', $board);
